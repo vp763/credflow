@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>Export Data</TALLYREQUEST>
+    <TYPE>Data</TYPE>
+    <ID>Day Book</ID>
+  </HEADER>
+  <BODY>
+    <DESC>
+      <STATICVARIABLES>
+        <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+        <SVCURRENTCOMPANY>ABC Trading Co.</SVCURRENTCOMPANY>
+        <SVFROMDATE>20240401</SVFROMDATE>
+        <SVTODATE>20250331</SVTODATE>
+        <EXPLODEVOUCHERS>Yes</EXPLODEVOUCHERS>
+        <EXPLODEBATCHALLOCATIONS>Yes</EXPLODEBATCHALLOCATIONS>
+      </STATICVARIABLES>
+      <TDL>
+        <TDLMESSAGE>
+          <REPORT NAME="Day Book" ISMODIFY="Yes" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <LOCAL>Collection : Default : Add :Filter : VchTypeFilter</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : VoucherTypeName</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : VoucherNumber</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : Date</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : EffectiveDate</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : Narration</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : PartyLedgerName</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : PartyName</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : Amount</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : BilledQty</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : ActualQty</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : Rate</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : GodownName</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : BatchName</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : StockItemName</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : LedgerEntriesList</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : InventoryEntriesList</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : AccountingAllocationsList</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : BillAllocationsList</LOCAL>
+            <LOCAL>Collection : Default : Add :Fetch : CostAllocationsList</LOCAL>
+          </REPORT>
+          <SYSTEM TYPE="Formulae" NAME="VchTypeFilter" ISMODIFY="No" ISFIXED="No" ISINTERNAL="No">$VoucherTypeName="Sales" OR $VoucherTypeName="Sales - GST" OR $VoucherTypeName="Sales Invoice"</SYSTEM>
+        </TDLMESSAGE>
+      </TDL>
+    </DESC>
+  </BODY>
+</ENVELOPE>

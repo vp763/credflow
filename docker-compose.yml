@@ -1,0 +1,261 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: credflow-postgres
+    environment:
+      POSTGRES_DB: credflow
+      POSTGRES_USER: credflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-credflow}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U credflow -d credflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - credflow-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: credflow-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - credflow-network
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: credflow-azurite
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    command: npx azurite --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001 --tableHost 0.0.0.0 --tablePort 10002 --location /workspace
+    volumes:
+      - azurite_data:/workspace
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z -w 2 127.0.0.1 10000 && nc -z -w 2 127.0.0.1 10001 && nc -z -w 2 127.0.0.1 10002"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - credflow-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: credflow-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: credflow
+      KC_DB_USERNAME: credflow
+      KC_DB_PASSWORD: credflow
+      KC_HOSTNAME: 0.0.0.0
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    command: start --http-port=8080 --hostname=0.0.0.0 --optimized
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - credflow-network
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: credflow-backend
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql+asyncpg://credflow:${POSTGRES_PASSWORD:-credflow}@postgres:5432/credflow
+      - REDIS_URL=redis://redis:6379/0
+      - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      - KEY_VAULT_URI=http://backend:8000/secrets
+      - AUTH_PROVIDER=keycloak
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=credflow
+      - KEYCLOAK_CLIENT_ID=credflow-backend
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-dev-secret}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production-min-32-chars}
+      - JWT_ALGORITHM=RS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=15
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - TALLY_SYNC_MAX_PAYLOAD_MB=50
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/backend:/app
+      - /app/.venv
+      - /app/__pycache__
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - credflow-network
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: credflow-worker
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql+asyncpg://credflow:${POSTGRES_PASSWORD:-credflow}@postgres:5432/credflow
+      - REDIS_URL=redis://redis:6379/0
+      - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      - KEY_VAULT_URI=http://backend:8000/secrets
+      - AUTH_PROVIDER=keycloak
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=credflow
+      - KEYCLOAK_CLIENT_ID=credflow-backend
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-dev-secret}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production-min-32-chars}
+      - JWT_ALGORITHM=RS256
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./apps/backend:/app
+      - /app/.venv
+      - /app/__pycache__
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+    networks:
+      - credflow-network
+    command: uv run celery -A app.worker.celery_app worker -Q default,tally,sync,notifications,payments -c 4 --loglevel=INFO
+
+  scheduler:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: credflow-scheduler
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql+asyncpg://credflow:${POSTGRES_PASSWORD:-credflow}@postgres:5432/credflow
+      - REDIS_URL=redis://redis:6379/0
+      - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      - KEY_VAULT_URI=http://backend:8000/secrets
+      - AUTH_PROVIDER=keycloak
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=credflow
+      - KEYCLOAK_CLIENT_ID=credflow-backend
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-dev-secret}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production-min-32-chars}
+      - JWT_ALGORITHM=RS256
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./apps/backend:/app
+      - /app/.venv
+      - /app/__pycache__
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+    networks:
+      - credflow-network
+    command: uv run celery -A app.worker.celery_app beat --loglevel=INFO
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: credflow-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8080
+      - NEXT_PUBLIC_KEYCLOAK_REALM=credflow
+      - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=credflow-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - credflow-network
+    command: npm run dev
+
+  nginx:
+    image: nginx:alpine
+    container_name: credflow-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/local.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - credflow-network
+
+  mock-tally:
+    build:
+      context: ./apps/mock-tally
+      dockerfile: Dockerfile
+    container_name: credflow-mock-tally
+    environment:
+      - MOCK_TALLY_PORT=9090
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./apps/mock-tally/data:/app/data
+    networks:
+      - credflow-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  azurite_data:
+  keycloak_data:
+
+networks:
+  credflow-network:
+    driver: bridge

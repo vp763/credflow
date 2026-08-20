@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>Export Data</TALLYREQUEST>
+    <TYPE>Collection</TYPE>
+    <ID>List of Companies</ID>
+  </HEADER>
+  <BODY>
+    <DESC>
+      <STATICVARIABLES>
+        <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+      </STATICVARIABLES>
+      <FETCHLIST>
+        <FETCH>NAME</FETCH>
+        <FETCH>GUID</FETCH>
+        <FETCH>STATENAME</FETCH>
+        <FETCH>COUNTRYNAME</FETCH>
+        <FETCH>FINANCIALYEARFROM</FETCH>
+        <FETCH>BOOKSFINYEARFROM</FETCH>
+      </FETCHLIST>
+    </DESC>
+  </BODY>
+</ENVELOPE>

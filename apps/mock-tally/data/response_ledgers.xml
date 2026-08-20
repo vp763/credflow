@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <STATUS>1</STATUS>
+  </HEADER>
+  <BODY>
+    <DATA>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Sundry Debtors" RESERVEDNAME="">
+          <GUID>d1e2f3a4-b5c6-7890-abcd-ef1234567890</GUID>
+          <PARENT>Current Assets</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>0</CLOSINGBALANCE>
+          <ISPARTYLEDGER>No</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Reliance Industries Ltd" RESERVEDNAME="">
+          <GUID>e2f3a4b5-c6d7-8901-bcde-f23456789012</GUID>
+          <PARENT>Sundry Debtors</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>1250000.00</CLOSINGBALANCE>
+          <ADDRESS>
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>Maker Chambers IV, Nariman Point</ADDRESS>
+              <ADDRESS>Mumbai</ADDRESS>
+              <ADDRESS>Maharashtra</ADDRESS>
+              <ADDRESS>400021</ADDRESS>
+            </ADDRESS.LIST>
+          </ADDRESS>
+          <STATENAME>Maharashtra</STATENAME>
+          <COUNTRYNAME>India</COUNTRYNAME>
+          <PINCODE>400021</PINCODE>
+          <LEDGERMOBILE>9876543210</LEDGERMOBILE>
+          <LEDGEREMAIL>accounts@reliance.com</LEDGEREMAIL>
+          <PARTYGSTIN>27AAACR5055K1ZP</PARTYGSTIN>
+          <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Tata Consultancy Services" RESERVEDNAME="">
+          <GUID>f3a4b5c6-d7e8-9012-cdef-345678901234</GUID>
+          <PARENT>Sundry Debtors</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>875000.00</CLOSINGBALANCE>
+          <ADDRESS>
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>TCS House, Raveline Street</ADDRESS>
+              <ADDRESS>Fort</ADDRESS>
+              <ADDRESS>Mumbai</ADDRESS>
+              <ADDRESS>Maharashtra</ADDRESS>
+              <ADDRESS>400001</ADDRESS>
+            </ADDRESS.LIST>
+          </ADDRESS>
+          <STATENAME>Maharashtra</STATENAME>
+          <COUNTRYNAME>India</COUNTRYNAME>
+          <PINCODE>400001</PINCODE>
+          <LEDGERMOBILE>9876543211</LEDGERMOBILE>
+          <LEDGEREMAIL>finance@tcs.com</LEDGEREMAIL>
+          <PARTYGSTIN>27AAACT4060Q1ZK</PARTYGSTIN>
+          <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Infosys Limited" RESERVEDNAME="">
+          <GUID>a4b5c6d7-e8f9-0123-defa-456789012345</GUID>
+          <PARENT>Sundry Debtors</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>650000.00</CLOSINGBALANCE>
+          <ADDRESS>
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>Electronics City, Hosur Road</ADDRESS>
+              <ADDRESS>Bengaluru</ADDRESS>
+              <ADDRESS>Karnataka</ADDRESS>
+              <ADDRESS>560100</ADDRESS>
+            </ADDRESS.LIST>
+          </ADDRESS>
+          <STATENAME>Karnataka</STATENAME>
+          <COUNTRYNAME>India</COUNTRYNAME>
+          <PINCODE>560100</PINCODE>
+          <LEDGERMOBILE>9876543212</LEDGERMOBILE>
+          <LEDGEREMAIL>accounts@infosys.com</LEDGEREMAIL>
+          <PARTYGSTIN>29AAACI4512K1ZP</PARTYGSTIN>
+          <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Wipro Limited" RESERVEDNAME="">
+          <GUID>b5c6d7e8-f9a0-1234-efab-567890123456</GUID>
+          <PARENT>Sundry Debtors</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>420000.00</CLOSINGBALANCE>
+          <ADDRESS>
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>Doddakannelli, Sarjapur Road</ADDRESS>
+              <ADDRESS>Bengaluru</ADDRESS>
+              <ADDRESS>Karnataka</ADDRESS>
+              <ADDRESS>560035</ADDRESS>
+            </ADDRESS.LIST>
+          </ADDRESS>
+          <STATENAME>Karnataka</STATENAME>
+          <COUNTRYNAME>India</COUNTRYNAME>
+          <PINCODE>560035</PINCODE>
+          <LEDGERMOBILE>9876543213</LEDGERMOBILE>
+          <LEDGEREMAIL>finance@wipro.com</LEDGEREMAIL>
+          <PARTYGSTIN>29AAACW0387R1ZP</PARTYGSTIN>
+          <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Adani Enterprises" RESERVEDNAME="">
+          <GUID>c6d7e8f9-a0b1-2345-fabc-678901234567</GUID>
+          <PARENT>Sundry Debtors</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>1890000.00</CLOSINGBALANCE>
+          <ADDRESS>
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>Adani House, Near Mithakhali Six Roads</ADDRESS>
+              <ADDRESS>Navrangpura</ADDRESS>
+              <ADDRESS>Ahmedabad</ADDRESS>
+              <ADDRESS>Gujarat</ADDRESS>
+              <ADDRESS>380009</ADDRESS>
+            </ADDRESS.LIST>
+          </ADDRESS>
+          <STATENAME>Gujarat</STATENAME>
+          <COUNTRYNAME>India</COUNTRYNAME>
+          <PINCODE>380009</PINCODE>
+          <LEDGERMOBILE>9876543214</LEDGERMOBILE>
+          <LEDGEREMAIL>accounts@adani.com</LEDGEREMAIL>
+          <PARTYGSTIN>24AABCA2804L1ZQ</PARTYGSTIN>
+          <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Bajaj Finance Ltd" RESERVEDNAME="">
+          <GUID>d7e8f9a0-b1c2-3456-abcd-789012345678</GUID>
+          <PARENT>Sundry Debtors</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>310000.00</CLOSINGBALANCE>
+          <ADDRESS>
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>Bajaj Auto Ltd Complex, Mumbai-Pune Road</ADDRESS>
+              <ADDRESS>Akurdi</ADDRESS>
+              <ADDRESS>Pune</ADDRESS>
+              <ADDRESS>Maharashtra</ADDRESS>
+              <ADDRESS>411035</ADDRESS>
+            </ADDRESS.LIST>
+          </ADDRESS>
+          <STATENAME>Maharashtra</STATENAME>
+          <COUNTRYNAME>India</COUNTRYNAME>
+          <PINCODE>411035</PINCODE>
+          <LEDGERMOBILE>9876543215</LEDGERMOBILE>
+          <LEDGEREMAIL>finance@bajajfinance.com</LEDGEREMAIL>
+          <PARTYGSTIN>27AABCB3765E1ZP</PARTYGSTIN>
+          <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="HDFC Bank Ltd" RESERVEDNAME="">
+          <GUID>e8f9a0b1-c2d3-4567-bcde-890123456789</GUID>
+          <PARENT>Bank Accounts</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>0</CLOSINGBALANCE>
+          <ISPARTYLEDGER>No</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="Sales - GST 18%" RESERVEDNAME="">
+          <GUID>f9a0b1c2-d3e4-5678-cdef-901234567890</GUID>
+          <PARENT>Sales Accounts</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>0</CLOSINGBALANCE>
+          <ISPARTYLEDGER>No</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="CGST Output 9%" RESERVEDNAME="">
+          <GUID>a0b1c2d3-e4f5-6789-defa-012345678901</GUID>
+          <PARENT>Duties & Taxes</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>0</CLOSINGBALANCE>
+          <ISPARTYLEDGER>No</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="SGST Output 9%" RESERVEDNAME="">
+          <GUID>b1c2d3e4-f5a6-7890-efab-123456789012</GUID>
+          <PARENT>Duties & Taxes</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>0</CLOSINGBALANCE>
+          <ISPARTYLEDGER>No</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+      <TALLYMESSAGE>
+        <LEDGER NAME="IGST Output 18%" RESERVEDNAME="">
+          <GUID>c2d3e4f5-a6b7-8901-fabc-234567890123</GUID>
+          <PARENT>Duties & Taxes</PARENT>
+          <OPENINGBALANCE>0</OPENINGBALANCE>
+          <CLOSINGBALANCE>0</CLOSINGBALANCE>
+          <ISPARTYLEDGER>No</ISPARTYLEDGER>
+          <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        </LEDGER>
+      </TALLYMESSAGE>
+    </DATA>
+  </BODY>
+</ENVELOPE>

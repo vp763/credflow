@@ -1,0 +1,32 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**", ".next/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "typecheck": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": ["coverage/**"],
+      "dependsOn": []
+    },
+    "db:migrate": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "db:seed": {
+      "dependsOn": ["db:migrate"],
+      "outputs": []
+    }
+  },
+  "globalEnv": ["DATABASE_URL", "REDIS_URL", "AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET", "RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "WHATSAPP_API_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"]
+}

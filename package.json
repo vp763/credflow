@@ -1,0 +1,52 @@
+{
+  "name": "credflow",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:migrate": "turbo run db:migrate --filter=db",
+    "db:seed": "turbo run db:seed --filter=db",
+    "docker:up": "docker-compose -f docker-compose.yml up -d",
+    "docker:down": "docker-compose -f docker-compose.yml down",
+    "docker:logs": "docker-compose -f docker-compose.yml logs -f",
+    "prepare": "husky",
+    "lint:staged": "lint-staged",
+    "commitlint": "commitlint"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0",
+    "@types/node": "^20.11.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.0",
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "packageManager": "npm@10.2.0",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,css,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.py": [
+      "ruff check --fix",
+      "ruff format"
+    ]
+  }
+}

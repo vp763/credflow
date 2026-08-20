@@ -1,0 +1,290 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+  POSTGRES_PASSWORD: credflow
+  REDIS_URL: redis://localhost:6379/0
+  DATABASE_URL: postgresql+asyncpg://credflow:credflow@localhost:5433/credflow
+
+jobs:
+  # ========================================
+  # LINT & TYPECHECK (runs on all PRs)
+  # ========================================
+  lint-and-typecheck:
+    name: Lint & TypeCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Run root lint
+        run: npm run lint
+
+      - name: Run root typecheck
+        run: npm run typecheck
+
+      - name: Lint frontend
+        working-directory: ./apps/frontend
+        run: |
+          npm ci
+          npm run lint
+
+      - name: Typecheck frontend
+        working-directory: ./apps/frontend
+        run: npm run typecheck
+
+      - name: Lint backend (ruff)
+        working-directory: ./apps/backend
+        run: |
+          pip install uv
+          uv sync --dev
+          uv run ruff check .
+
+      - name: Typecheck backend (mypy)
+        working-directory: ./apps/backend
+        run: uv run mypy .
+
+  # ========================================
+  # TESTS (runs on all PRs)
+  # ========================================
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: ./apps/frontend
+        run: npm ci
+
+      - name: Run tests
+        working-directory: ./apps/frontend
+        run: npm run test -- --ci --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./apps/frontend/coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
+
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: credflow
+          POSTGRES_USER: credflow
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U credflow -d credflow"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        working-directory: ./apps/backend
+        run: uv sync --dev
+
+      - name: Run database migrations
+        working-directory: ./apps/backend
+        run: uv run alembic upgrade head
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Run tests
+        working-directory: ./apps/backend
+        run: uv run pytest -v --cov=app --cov-report=xml
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./apps/backend/coverage.xml
+          flags: backend
+          fail_ci_if_error: false
+
+  # ========================================
+  # BUILD (runs on main/develop pushes)
+  # ========================================
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    needs: [lint-and-typecheck, test-frontend]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: ./apps/frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: ./apps/frontend
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: apps/frontend/.next/
+          retention-days: 1
+
+  build-backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    needs: [lint-and-typecheck, test-backend]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        working-directory: ./apps/backend
+        run: uv sync --dev
+
+      - name: Build Docker image
+        working-directory: ./apps/backend
+        run: docker build -t credflow-backend:${{ github.sha }} -f Dockerfile --target production .
+
+  # ========================================
+  # COMMITLINT (runs on all PRs)
+  # ========================================
+  commitlint:
+    name: Commitlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run commitlint
+        run: npx commitlint --from=${{ github.event.pull_request.base.sha || github.event.before }} --to=${{ github.event.pull_request.head.sha || github.sha }} --verbose
+
+  # ========================================
+  # SECURITY SCAN (runs on main pushes)
+  # ========================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run pip-audit (backend)
+        working-directory: ./apps/backend
+        run: |
+          pip install pip-audit
+          pip-audit
+        continue-on-error: true
+
+  # ========================================
+  # SUMMARY
+  # ========================================
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    if: always()
+    needs: [lint-and-typecheck, test-frontend, test-backend, commitlint]
+    steps:
+      - name: Check job statuses
+        run: |
+          echo "Lint & TypeCheck: ${{ needs.lint-and-typecheck.result }}"
+          echo "Test Frontend: ${{ needs.test-frontend.result }}"
+          echo "Test Backend: ${{ needs.test-backend.result }}"
+          echo "Commitlint: ${{ needs.commitlint.result }}"
+          
+          if [[ "${{ needs.lint-and-typecheck.result }}" != "success" ]] ||
+             [[ "${{ needs.test-frontend.result }}" != "success" ]] ||
+             [[ "${{ needs.test-backend.result }}" != "success" ]] ||
+             [[ "${{ needs.commitlint.result }}" != "success" ]]; then
+            echo "::error::One or more required checks failed"
+            exit 1
+          fi
