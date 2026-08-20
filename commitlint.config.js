@@ -1,5 +1,5 @@
 /** @type {import('@commitlint/types').UserConfig} */
-export default {
+module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [
@@ -17,8 +17,8 @@ export default {
         'ci',
         'build',
         'revert',
-        'wip'
-      ]
+        'wip',
+      ],
     ],
     'type-case': [2, 'always', 'lower-case'],
     'type-empty': [2, 'never'],
@@ -28,7 +28,7 @@ export default {
     'subject-full-stop': [2, 'never', '.'],
     'header-max-length': [2, 'always', 100],
     'body-max-line-length': [2, 'always', 100],
-    'footer-max-line-length': [2, 'always', 100]
+    'footer-max-line-length': [2, 'always', 100],
   },
   prompt: {
     messages: {
@@ -40,22 +40,42 @@ export default {
       breakingBody: 'Describe breaking change:',
       breaking: 'Breaking changes (optional):',
       footer: 'Issues to reference (optional):',
-      confirmCommit: 'Commit with this message?'
+      confirmCommit: 'Commit with this message?',
     },
     types: [
       { value: 'feat', name: 'feat:     A new feature', emoji: '✨' },
       { value: 'fix', name: 'fix:      A bug fix', emoji: '🐛' },
       { value: 'docs', name: 'docs:     Documentation only changes', emoji: '📚' },
-      { value: 'style', name: 'style:    Changes that do not affect the meaning of the code', emoji: '💎' },
-      { value: 'refactor', name: 'refactor: A code change that neither fixes a bug nor adds a feature', emoji: '♻️' },
+      {
+        value: 'style',
+        name: 'style:    Changes that do not affect the meaning of the code',
+        emoji: '💎',
+      },
+      {
+        value: 'refactor',
+        name: 'refactor: A code change that neither fixes a bug nor adds a feature',
+        emoji: '♻️',
+      },
       { value: 'perf', name: 'perf:     A code change that improves performance', emoji: '⚡' },
-      { value: 'test', name: 'test:     Adding missing tests or correcting existing tests', emoji: '🧪' },
-      { value: 'chore', name: 'chore:    Changes to the build process or auxiliary tools', emoji: '🔧' },
+      {
+        value: 'test',
+        name: 'test:     Adding missing tests or correcting existing tests',
+        emoji: '🧪',
+      },
+      {
+        value: 'chore',
+        name: 'chore:    Changes to the build process or auxiliary tools',
+        emoji: '🔧',
+      },
       { value: 'ci', name: 'ci:       Changes to CI configuration files and scripts', emoji: '👷' },
-      { value: 'build', name: 'build:    Changes that affect the build system or external dependencies', emoji: '📦' },
+      {
+        value: 'build',
+        name: 'build:    Changes that affect the build system or external dependencies',
+        emoji: '📦',
+      },
       { value: 'revert', name: 'revert:   Reverts a previous commit', emoji: '⏪' },
-      { value: 'wip', name: 'wip:      Work in progress', emoji: '🚧' }
+      { value: 'wip', name: 'wip:      Work in progress', emoji: '🚧' },
     ],
-    useEmoji: true
-  }
+    useEmoji: true,
+  },
 };
