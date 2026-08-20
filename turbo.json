@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**", ".next/**"]
@@ -28,5 +28,15 @@
       "outputs": []
     }
   },
-  "globalEnv": ["DATABASE_URL", "REDIS_URL", "AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET", "RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "WHATSAPP_API_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"]
+  "globalEnv": [
+    "DATABASE_URL",
+    "REDIS_URL",
+    "AZURE_TENANT_ID",
+    "AZURE_CLIENT_ID",
+    "AZURE_CLIENT_SECRET",
+    "RAZORPAY_KEY_ID",
+    "RAZORPAY_KEY_SECRET",
+    "WHATSAPP_API_TOKEN",
+    "WHATSAPP_PHONE_NUMBER_ID"
+  ]
 }
