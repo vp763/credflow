@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import get_db, get_tenant_db
 from app.core.security import (
     create_token_pair,
     decode_token,
@@ -482,7 +482,7 @@ async def get_me(
     tenant_id: UUID = Depends(get_current_tenant_id),
     user_id: UUID = Depends(get_current_user_id),
     permissions: list = Depends(get_current_permissions),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
 ):
     """Get current user profile."""
     result = await db.execute(

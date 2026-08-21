@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
   PYTHON_VERSION: '3.11'
   POSTGRES_PASSWORD: credflow
   REDIS_URL: redis://localhost:6379/0
@@ -110,7 +110,7 @@ jobs:
           POSTGRES_DB: credflow
           POSTGRES_USER: credflow
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-        ports: ["5433:5432"]
+        ports: ['5433:5432']
         options: >-
           --health-cmd "pg_isready -U credflow -d credflow"
           --health-interval 5s
@@ -118,7 +118,7 @@ jobs:
           --health-retries 5
       redis:
         image: redis:7-alpine
-        ports: ["6379:6379"]
+        ports: ['6379:6379']
         options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 5
     steps:
       - name: Checkout repository
@@ -238,8 +238,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check if initial commit
+        id: check_initial
+        run: |
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            echo "initial=true" >> $GITHUB_OUTPUT
+          else
+            echo "initial=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run commitlint
+        if: steps.check_initial.outputs.initial == 'false'
         run: npx commitlint --from=${{ github.event.pull_request.base.sha || github.event.before }} --to=${{ github.event.pull_request.head.sha || github.sha }} --verbose
+
+      - name: Skip commitlint for initial commit
+        if: steps.check_initial.outputs.initial == 'true'
+        run: echo "Skipping commitlint for initial commit"
 
   # ========================================
   # SECURITY SCAN (runs on main pushes)
@@ -280,11 +294,17 @@ jobs:
           echo "Test Frontend: ${{ needs.test-frontend.result }}"
           echo "Test Backend: ${{ needs.test-backend.result }}"
           echo "Commitlint: ${{ needs.commitlint.result }}"
-          
+
+          # Check required jobs (allow skipped for commitlint on initial commit)
           if [[ "${{ needs.lint-and-typecheck.result }}" != "success" ]] ||
              [[ "${{ needs.test-frontend.result }}" != "success" ]] ||
-             [[ "${{ needs.test-backend.result }}" != "success" ]] ||
-             [[ "${{ needs.commitlint.result }}" != "success" ]]; then
+             [[ "${{ needs.test-backend.result }}" != "success" ]]; then
             echo "::error::One or more required checks failed"
+            exit 1
+          fi
+
+          # Commitlint can be skipped (initial commit) or success
+          if [[ "${{ needs.commitlint.result }}" != "success" ]] && [[ "${{ needs.commitlint.result }}" != "skipped" ]]; then
+            echo "::error::Commitlint check failed"
             exit 1
           fi
