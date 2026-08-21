@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import get_db, get_tenant_db
 from app.core.security import verify_api_key
 from app.core.tenant import get_current_tenant_id
 from app.models import TallyCompany, SyncLog, Customer, Invoice, Payment
@@ -177,7 +177,7 @@ async def receive_tally_sync(
 
 @router.get("/companies", response_model=List[TallyCompanyResponse])
 async def list_tally_companies(
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
     tenant_id: UUID = Depends(get_current_tenant_id),
 ):
     """List Tally companies for current tenant."""
@@ -205,7 +205,7 @@ async def list_tally_companies(
 
 @router.get("/sync-logs", response_model=List[SyncLogResponse])
 async def get_sync_logs(
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
     tenant_id: UUID = Depends(get_current_tenant_id),
     company_id: Optional[UUID] = None,
     status_filter: Optional[str] = None,
@@ -263,7 +263,7 @@ async def get_sync_logs(
 @router.post("/sync/trigger")
 async def trigger_manual_sync(
     company_id: UUID,
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
     tenant_id: UUID = Depends(get_current_tenant_id),
 ):
     """Manually trigger sync for a company."""

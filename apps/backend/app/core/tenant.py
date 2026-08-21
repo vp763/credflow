@@ -80,10 +80,18 @@ class TenantMiddleware(BaseHTTPMiddleware):
 
             # Set tenant context on request state
             request.state.tenant_id = tenant_id
-            request.state.user_id = payload.get("sub")
-            request.state.role = payload.get("role", "viewer")
-            request.state.permissions = payload.get("permissions", [])
-            request.state.email = payload.get("email")
+            # Handle both dict (Keycloak) and TokenPayload (local JWT)
+            if hasattr(payload, "model_dump"):
+                payload_dict = payload.model_dump()
+            elif hasattr(payload, "dict"):
+                payload_dict = payload.dict()
+            else:
+                payload_dict = payload
+
+            request.state.user_id = payload_dict.get("sub")
+            request.state.role = payload_dict.get("role", "viewer")
+            request.state.permissions = payload_dict.get("permissions", [])
+            request.state.email = payload_dict.get("email")
 
         except ValueError as e:
             return JSONResponse(

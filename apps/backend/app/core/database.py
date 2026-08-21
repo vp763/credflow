@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 from sqlalchemy import event, text
+from fastapi import Request, HTTPException
 
 from app.core.config import settings
 from app.models.base import Base
@@ -118,3 +119,12 @@ def checkout_connection(dbapi_connection, connection_record, connection_proxy):
         cursor.execute("SELECT set_config('app.tenant_id', '', false)")
     finally:
         cursor.close()
+
+
+async def get_tenant_db(request: Request) -> AsyncGenerator[AsyncSession, None]:
+    """Tenant-aware DB session - sets app.tenant_id for RLS."""
+    tenant_id = getattr(request.state, "tenant_id", None)
+    if not tenant_id:
+        raise HTTPException(status_code=401, detail="Tenant context missing")
+    async with TenantSessionContext(str(tenant_id)) as session:
+        yield session

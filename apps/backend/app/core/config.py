@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Authentication - Keycloak / Azure Entra ID
-    AUTH_PROVIDER: str = "keycloak"  # keycloak, azure, mock
+    AUTH_PROVIDER: str = "local"  # keycloak, azure, mock
     KEYCLOAK_URL: str = "http://localhost:8080"
     KEYCLOAK_REALM: str = "credflow"
     KEYCLOAK_CLIENT_ID: str = "credflow-backend"

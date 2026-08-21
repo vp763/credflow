@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import get_db, get_tenant_db
 from app.core.security import generate_api_key, verify_api_key
 from app.core.tenant import get_current_tenant_id
 from app.models import Agent, TallyCompany, SyncLog
@@ -60,7 +60,7 @@ class AgentListResponse(BaseModel):
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=AgentRegisterResponse)
 async def register_agent(
     request: AgentRegisterRequest,
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
     tenant_id: UUID = Depends(get_current_tenant_id),
 ):
     """Register a new Tally agent."""
@@ -151,7 +151,7 @@ async def agent_heartbeat(
 
 @router.get("", response_model=AgentListResponse)
 async def list_agents(
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
     tenant_id: UUID = Depends(get_current_tenant_id),
     status_filter: Optional[str] = None,
     limit: int = 20,
@@ -191,7 +191,7 @@ async def list_agents(
 @router.delete("/{agent_id}")
 async def deactivate_agent(
     agent_id: UUID,
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_tenant_db),
     tenant_id: UUID = Depends(get_current_tenant_id),
 ):
     """Deactivate agent."""
